@@ -1,0 +1,15 @@
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Code quality
+ruff>=0.1.0
+black>=23.7.0
+
+# Dependencies for validation
+pyyaml>=6.0
+jsonschema>=4.19.0
+
+# Development tools
+setuptools>=68.0.0
+wheel>=0.41.0
