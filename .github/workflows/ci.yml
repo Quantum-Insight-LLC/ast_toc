@@ -36,6 +36,9 @@ jobs:
         run: |
           pytest -q --junitxml=junit.xml --cov=src --cov-report=xml
 
+      - name: Validate traceability
+        run: python tools/validate_trace.py
+
       - name: Upload junit
         uses: actions/upload-artifact@v4
         if: always()
