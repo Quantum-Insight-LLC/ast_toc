@@ -1,3 +1,14 @@
+# === FILE_TOC BEGIN ===
+# FILE_TOC
+# Module: cli
+# Purpose: TODO: Add module purpose
+# Classes: None
+# Functions: def main(), def start_daemon(), def stop_daemon(), def status_daemon()
+# Imports: import sys, from src.cli.config_loader import load_config, from src.cli.daemon import Daemon
+# Updated: 2025-09-27 19:47:01
+# Generated-By: ast_toc
+# === FILE_TOC END ===
+
 """CLI interface for AST TOC daemon."""
 
 import sys

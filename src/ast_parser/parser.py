@@ -1,3 +1,14 @@
+# === FILE_TOC BEGIN ===
+# FILE_TOC
+# Module: parser
+# Purpose: TODO: Add module purpose
+# Classes: class ASTParser
+# Functions: ASTParser.parse_file(file_path), ASTParser._is_nested(node, tree), ASTParser._format_args(args), ASTParser._format_import(node), ASTParser._get_name(node)
+# Imports: import ast
+# Updated: 2025-09-27 19:47:01
+# Generated-By: ast_toc
+# === FILE_TOC END ===
+
 """AST parser for extracting Python file structure."""
 
 import ast

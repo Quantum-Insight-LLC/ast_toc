@@ -1,3 +1,14 @@
+# === FILE_TOC BEGIN ===
+# FILE_TOC
+# Module: generator
+# Purpose: TODO: Add module purpose
+# Classes: class TOCGenerator
+# Functions: TOCGenerator.__init__(), TOCGenerator.generate_toc(file_path, ast_structure, insert_above_docstring), TOCGenerator._detect_file_properties(file_path), TOCGenerator._create_toc_content(file_path, ast_structure), TOCGenerator._insert_toc(content, toc_content, insert_above_docstring), TOCGenerator._remove_existing_toc(lines), TOCGenerator._find_insertion_point(lines, insert_above_docstring), TOCGenerator._atomic_write(file_path, content, encoding, line_ending)
+# Imports: import os, import shutil, import tempfile, import tokenize, from datetime import datetime
+# Updated: 2025-09-27 19:47:01
+# Generated-By: ast_toc
+# === FILE_TOC END ===
+
 """TOC generator for Python files."""
 
 import os
@@ -38,6 +49,10 @@ class TOCGenerator:
 
         # Insert TOC into content
         new_content = self._insert_toc(content, toc_content, insert_above_docstring)
+
+        # Check if content actually changed (idempotency)
+        if content == new_content:
+            return  # No changes needed
 
         # Write atomically
         self._atomic_write(file_path, new_content, encoding, line_ending)
@@ -103,9 +118,22 @@ class TOCGenerator:
         # Find insertion point
         insert_pos = self._find_insertion_point(lines, insert_above_docstring)
 
+        # Remove leading empty lines before insertion point
+        while insert_pos > 0 and not lines[insert_pos - 1].strip():
+            insert_pos -= 1
+
         # Insert TOC
         toc_lines = toc_content.split("\n")
-        new_lines = lines[:insert_pos] + toc_lines + [""] + lines[insert_pos:]
+
+        # Check if we need to add a blank line after TOC
+        needs_blank_line = False
+        if insert_pos < len(lines) and lines[insert_pos].strip():
+            needs_blank_line = True
+
+        new_lines = lines[:insert_pos] + toc_lines
+        if needs_blank_line:
+            new_lines.append("")
+        new_lines.extend(lines[insert_pos:])
 
         return "\n".join(new_lines)
 
@@ -122,13 +150,23 @@ class TOCGenerator:
                 break
 
         if begin_idx is not None and end_idx is not None:
-            # Remove TOC block and any following empty lines
+            # Remove TOC block
             new_lines = lines[:begin_idx]
-            # Skip empty lines after TOC
-            for i in range(end_idx + 1, len(lines)):
-                if lines[i].strip():
+
+            # Skip empty lines after TOC, but keep at most one
+            after_toc_start = end_idx + 1
+            empty_lines_count = 0
+
+            for i in range(after_toc_start, len(lines)):
+                if not lines[i].strip():
+                    empty_lines_count += 1
+                else:
+                    # Add at most one empty line before non-empty content
+                    if empty_lines_count > 0:
+                        new_lines.append("")
                     new_lines.extend(lines[i:])
                     break
+
             return new_lines
 
         return lines
@@ -158,6 +196,14 @@ class TOCGenerator:
         )
 
         try:
+            # Normalize line endings: first normalize to \n, then convert to target
+            normalized_content = content.replace("\r\n", "\n").replace("\r", "\n")
+            normalized_content = normalized_content.replace("\n", line_ending)
+
+            # Ensure exactly one trailing line ending
+            if not normalized_content.endswith(line_ending):
+                normalized_content += line_ending
+
             # Write to temp file
             with os.fdopen(temp_fd, "w", encoding=encoding, newline="") as f:
                 # Normalize line endings

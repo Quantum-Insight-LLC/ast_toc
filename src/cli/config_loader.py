@@ -1,3 +1,14 @@
+# === FILE_TOC BEGIN ===
+# FILE_TOC
+# Module: config_loader
+# Purpose: TODO: Add module purpose
+# Classes: None
+# Functions: def load_config(config_path)
+# Imports: import json, from pathlib import Path, from typing import Any, import jsonschema
+# Updated: 2025-09-27 19:47:01
+# Generated-By: ast_toc
+# === FILE_TOC END ===
+
 """Configuration loader for AST TOC daemon."""
 
 import json

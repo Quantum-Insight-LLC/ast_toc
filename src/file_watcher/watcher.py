@@ -1,3 +1,14 @@
+# === FILE_TOC BEGIN ===
+# FILE_TOC
+# Module: watcher
+# Purpose: TODO: Add module purpose
+# Classes: class FileWatcher
+# Functions: FileWatcher.__init__(root_path), FileWatcher._setup_logger(), FileWatcher.start(), FileWatcher.stop(timeout), FileWatcher.should_ignore(path), FileWatcher.on_modified(path), FileWatcher.wait_for_toc_update(path, timeout)
+# Imports: import fnmatch, import logging, import time, from pathlib import Path, from src.ast_parser.parser import ASTParser, from src.toc_generator.generator import TOCGenerator
+# Updated: 2025-09-27 19:47:01
+# Generated-By: ast_toc
+# === FILE_TOC END ===
+
 """File watcher for monitoring Python files and updating TOC."""
 
 import fnmatch
