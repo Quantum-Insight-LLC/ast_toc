@@ -196,6 +196,7 @@ def test_start_logging_levels_present():
             "log_file": str(Path(temp_dir) / ".ast_toc.log"),
             "insert_above_docstring": True,
             "log_level": "DEBUG",
+            "logging_probe_on_start": ["INFO", "ERROR", "DEBUG"],
         }
 
         with open(config_file, "w") as f:

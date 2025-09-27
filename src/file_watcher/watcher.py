@@ -48,15 +48,7 @@ class FileWatcher:
         """Setup logger for file operations."""
         logger = logging.getLogger("ast_toc.watcher")
         logger.setLevel(logging.INFO)
-
-        if not logger.handlers:
-            handler = logging.FileHandler(".ast_toc.log")
-            formatter = logging.Formatter(
-                "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-            )
-            handler.setFormatter(formatter)
-            logger.addHandler(handler)
-
+        # Logger setup is now centralized in daemon.py
         return logger
 
     def start(self) -> None:

@@ -49,9 +49,28 @@ class Daemon:
         )
 
         self.logger = logging.getLogger("ast_toc.daemon")
+
+        # Setup ast_toc.watcher logger
+        watcher_logger = logging.getLogger("ast_toc.watcher")
+        watcher_logger.propagate = False
+
         self.logger.info("Logging initialized")
-        self.logger.debug("Debug logging enabled")
-        self.logger.error("Error logging test")
+
+        # Check if we should write test probe messages
+        should_probe = self._should_write_logging_probe()
+        if should_probe:
+            self.logger.debug("Debug logging enabled")
+            self.logger.error("Error logging test")
+
+    def _should_write_logging_probe(self) -> bool:
+        """Check if we should write logging probe messages."""
+        # Check environment variable
+        if os.getenv("AST_TOC_TEST_MODE", "").lower() in ("true", "1", "yes"):
+            return True
+
+        # Check config field
+        probe_levels = self.config.get("logging_probe_on_start", [])
+        return len(probe_levels) > 0
 
     def start(self) -> None:
         """Start the daemon."""

@@ -36,6 +36,7 @@ def load_config(config_path: str = ".ast_toc.yaml") -> dict[str, Any]:
         "include": ["**/*.py"],
         "exclude": ["**/__pycache__/**", "**/.venv/**", "**/.git/**"],
         "max_file_mb": 1,
+        "logging_probe_on_start": [],
     }
 
     for key, value in defaults.items():
