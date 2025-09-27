@@ -7,3 +7,4 @@ include: ["**/*.py"]
 exclude: ["**/__pycache__/**", "**/.venv/**", "**/.git/**"]
 max_file_mb: 1
 logging_probe_on_start: []
+initial_scan: true

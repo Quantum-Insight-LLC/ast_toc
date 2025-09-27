@@ -209,8 +209,8 @@ def test_generate_toc_update_existing():
         assert begin_count == 1
         assert end_count == 1
 
-        # Should have updated function count
-        assert "Functions: 1" in content
+        # Should have updated function list
+        assert "Functions: def new_func()" in content
 
     finally:
         os.unlink(temp_path)

@@ -78,14 +78,14 @@ class TOCGenerator:
 
         toc_lines = [
             self.begin_marker,
-            "FILE_TOC",
-            f"Module: {module_name}",
-            f"Purpose: {purpose}",
-            f"Classes: {len(classes)}",
-            f"Functions: {len(functions)}",
-            f"Imports: {len(imports)}",
-            f"Updated: {now}",
-            "Generated-By: ast_toc",
+            "# FILE_TOC",
+            f"# Module: {module_name}",
+            f"# Purpose: {purpose}",
+            f"# Classes: {', '.join(classes) if classes else 'None'}",
+            f"# Functions: {', '.join(functions) if functions else 'None'}",
+            f"# Imports: {', '.join(imports) if imports else 'None'}",
+            f"# Updated: {now}",
+            "# Generated-By: ast_toc",
             self.end_marker,
         ]
 
