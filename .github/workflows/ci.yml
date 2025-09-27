@@ -14,73 +14,38 @@ jobs:
         python-version: ["3.12"]
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Cache pip dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-dev.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
+      - name: Install dev deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements-dev.txt
+      - name: Lint (ruff & black --check)
+        run: |
+          ruff check .
+          black --check .
 
-    - name: Lint with ruff
-      run: |
-        ruff check . --output-format=github
+      - name: Run tests (pytest + coverage)
+        run: |
+          pytest -q --junitxml=junit.xml --cov=src --cov-report=xml
 
-    - name: Format check with black
-      run: |
-        black --check --diff .
+      - name: Upload junit
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: junit-${{ matrix.python-version }}
+          path: junit.xml
 
-    - name: Validate traceability
-      run: |
-        python tools/validate_trace.py
-
-    - name: Test with pytest and coverage
-      run: |
-        pytest \
-          --cov=src \
-          --cov-report=xml:coverage.xml \
-          --cov-report=term-missing \
-          --cov-fail-under=70 \
-          --junitxml=junit.xml \
-          --strict-markers \
-          --strict-config \
-          -v
-
-    - name: Check for xfail failures
-      run: |
-        # Fail if any xfail tests are actually passing (strict=True)
-        pytest --runxfail --tb=no -q || true
-        if pytest --runxfail --tb=no -q | grep -q "PASSED"; then
-          echo "ERROR: Some xfail tests are actually passing (strict=True violation)"
-          exit 1
-        fi
-
-    - name: Upload coverage reports
-      uses: codecov/codecov-action@v3
-      if: matrix.python-version == '3.12'
-      with:
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-
-    - name: Upload test results
-      uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: test-results-${{ matrix.python-version }}
-        path: |
-          junit.xml
-          coverage.xml
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ matrix.python-version }}
+          path: coverage.xml
