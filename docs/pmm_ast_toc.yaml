@@ -137,9 +137,15 @@ data:
       invariants: ["ignore_nested_functions", "no_type_annotations"]
 observability:
   metrics:
-    - name: "toc.generation.latency_ms" ; type: "histogram" ; owner: "toc_generator"
-    - name: "file.watch.events_total" ; type: "counter" ; owner: "file_watcher"
-    - name: "daemon.uptime_seconds" ; type: "gauge" ; owner: "cli"
+    - name: "toc.generation.latency_ms"
+      type: "histogram"
+      owner: "toc_generator"
+    - name: "file.watch.events_total"
+      type: "counter"
+      owner: "file_watcher"
+    - name: "daemon.uptime_seconds"
+      type: "gauge"
+      owner: "cli"
 tests:
   pyramid:
     unit: ">=70%"
