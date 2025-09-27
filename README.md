@@ -11,6 +11,9 @@
 - 🔧 **Конфигурация**: Гибкие настройки через `.ast_toc.yaml`
 - 🛡️ **Безопасность**: Атомарная запись, сохранение кодировки и переводов строк
 - 📊 **Логирование**: Подробные логи с уровнями INFO/ERROR/DEBUG
+- 🚀 **Initial Scan**: Автоматическое сканирование и обновление TOC при запуске
+- 🎯 **Идемпотентность**: Повторные запуски не создают лишних изменений
+- 🧹 **Утилиты**: Скрипт для удаления TOC заголовков
 
 ## Установка
 
@@ -57,33 +60,45 @@ log_level: "INFO"
 include: ["**/*.py"]
 exclude: ["**/__pycache__/**", "**/.venv/**", "**/.git/**"]
 max_file_mb: 1
+logging_probe_on_start: []
+initial_scan: true
 ```
 
 ### CLI команды
 
 ```bash
-# Запуск демона
-python -m src.cli.cli start
+# Запуск демона (с initial_scan)
+ast_toc start
 
 # Проверка статуса
-python -m src.cli.cli status
+ast_toc status
 
 # Остановка демона
-python -m src.cli.cli stop
+ast_toc stop
+```
+
+### Утилиты
+
+```bash
+# Удаление TOC заголовков из файла
+python tools/remove_toc_headers.py file.py
+
+# Удаление TOC заголовков из директории
+python tools/remove_toc_headers.py src/
 ```
 
 ### Пример TOC заголовка
 
 ```python
 # === FILE_TOC BEGIN ===
-FILE_TOC
-Module: example
-Purpose: TODO: Add module purpose
-Classes: 2
-Functions: 5
-Imports: 3
-Updated: 2025-09-27 17:30:00
-Generated-By: ast_toc
+# FILE_TOC
+# Module: example
+# Purpose: TODO: Add module purpose
+# Classes: class MyClass, class AnotherClass
+# Functions: MyClass.method(), def standalone_function(), def another_function()
+# Imports: import os, from typing import List
+# Updated: 2025-09-27 19:47:01
+# Generated-By: ast_toc
 # === FILE_TOC END ===
 
 """Module docstring here..."""
@@ -142,7 +157,8 @@ ast_toc/
 │   ├── integration/        # Интеграционные тесты (10 тестов)
 │   └── e2e/                # E2E тесты (12 тестов)
 ├── tools/                   # Инструменты
-│   └── validate_trace.py   # Валидатор трассируемости
+│   ├── validate_trace.py   # Валидатор трассируемости
+│   └── remove_toc_headers.py # Удаление TOC заголовков
 ├── .github/workflows/       # CI/CD
 └── src/                     # Исходный код
     ├── ast_parser/         # AST парсер
@@ -169,6 +185,9 @@ ast_toc/
 - [x] TOC генератор с атомарной записью
 - [x] Конфигурация через YAML
 - [x] Логирование и обработка ошибок
+- [x] Initial scan при запуске демона
+- [x] Идемпотентность генерации TOC
+- [x] Утилита для удаления TOC заголовков
 - [x] Соответствие контрактам и требованиям
 
 ## Лицензия
