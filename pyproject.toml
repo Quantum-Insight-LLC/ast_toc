@@ -38,7 +38,11 @@ dev = [
 ]
 
 [project.scripts]
-ast_toc = "ast_toc.cli:main"
+ast_toc = "src.cli.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
 
 # Ruff configuration
 [tool.ruff]

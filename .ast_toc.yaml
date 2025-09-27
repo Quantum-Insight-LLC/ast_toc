@@ -1,0 +1,8 @@
+watch_path: "./src"
+pid_file: ".ast_toc.pid"
+log_file: ".ast_toc.log"
+insert_above_docstring: true
+log_level: "INFO"
+include: ["**/*.py"]
+exclude: ["**/__pycache__/**", "**/.venv/**", "**/.git/**"]
+max_file_mb: 1
