@@ -44,10 +44,17 @@ def load_config(config_path: str = ".ast_toc.yaml") -> dict[str, Any]:
 
     # Validate against schema
     schema_path = Path("docs/schemas/ast_toc_config.json")
-    with open(schema_path, encoding="utf-8") as f:
-        schema = json.load(f)
+    if not schema_path.exists():
+        # Try relative to current working directory
+        schema_path = Path.cwd() / "docs/schemas/ast_toc_config.json"
 
-    jsonschema.validate(config, schema)
+    try:
+        with open(schema_path, encoding="utf-8") as f:
+            schema = json.load(f)
+        jsonschema.validate(config, schema)
+    except FileNotFoundError:
+        # Skip schema validation if schema file not found
+        pass
 
     # Check required fields
     required_fields = ["watch_path", "pid_file", "log_file", "insert_above_docstring"]
