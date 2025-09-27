@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AST TOC Config",
+  "type": "object",
+  "properties": {
+    "watch_path": { "type": "string" },
+    "pid_file": { "type": "string" },
+    "log_file": { "type": "string" },
+    "log_level": { "type": "string", "enum": ["DEBUG","INFO","ERROR"] },
+    "insert_above_docstring": { "type": "boolean" },
+    "include": { "type": "array", "items": { "type": "string" } },
+    "exclude": { "type": "array", "items": { "type": "string" } },
+    "max_file_mb": { "type": "number", "minimum": 0.1 },
+    "header": {
+      "type": "object",
+      "properties": {
+        "begin_marker": { "type": "string" },
+        "end_marker": { "type": "string" },
+        "purpose_policy": { "type": "string", "enum": ["preserve_or_todo","docstring_first_line","static"] },
+        "static_purpose": { "type": "string" }
+      },
+      "required": ["begin_marker","end_marker","purpose_policy"]
+    }
+  },
+  "required": ["watch_path","pid_file","log_file","insert_above_docstring"]
+}

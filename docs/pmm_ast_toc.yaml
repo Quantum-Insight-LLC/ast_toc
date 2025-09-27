@@ -1,0 +1,149 @@
+project:
+  name: "AST-TOC Daemon"
+  domain: "development_tools"
+  runtime:
+    language: "Python"
+    framework: "watchdog, pyyaml"
+    database: "none"
+    messaging: "none"
+  non_functionals:
+    performance: { p99_ms: 100, rps_target: 5000 }
+    availability: "continuous_daemon"
+    security: ["atomic_file_write", "system_directory_ignore"]
+    compliance: []
+    maintainability: { test_coverage: ">=70%", linting: "enabled" }
+  patterns: ["Daemon", "File Watcher", "AST Parser"]
+modules:
+  - name: "ast_parser"
+    responsibilities: ["parse_python_ast", "extract_structure"]
+    dependencies: ["ast_module"]
+    requirements: ["REQ-03"]
+    folders:
+      - path: "src/ast_parser"
+        files:
+          - name: "parser.py"
+            classes:
+              - name: "ASTParser"
+                methods:
+                  - name: "parse_file"
+                    input: "file_path"
+                    output: "ASTStructure"
+                    invariants: ["ignore_nested_functions", "no_type_annotations"]
+          - name: "tests/test_parser.py"
+            type: "unit"
+            given_when_then:
+              - given: "valid_python_file"
+                when: "parse_file called"
+                then: "extracted_classes_and_functions"
+  - name: "toc_generator"
+    responsibilities: ["generate_toc", "format_header"]
+    dependencies: ["ast_parser"]
+    requirements: ["REQ-01", "REQ-02", "REQ-06"]
+    folders:
+      - path: "src/toc_generator"
+        files:
+          - name: "generator.py"
+            classes:
+              - name: "TOCGenerator"
+                methods:
+                  - name: "generate_toc"
+                    input: "ASTStructure"
+                    output: "TOCHeader"
+                    invariants: ["preserve_encoding", "atomic_write"]
+          - name: "tests/test_generator.py"
+            type: "unit"
+            given_when_then:
+              - given: "ast_structure"
+                when: "generate_toc called"
+                then: "formatted_header_with_markers"
+  - name: "file_watcher"
+    responsibilities: ["monitor_files", "trigger_updates"]
+    dependencies: ["watchdog"]
+    requirements: ["REQ-05"]
+    folders:
+      - path: "src/file_watcher"
+        files:
+          - name: "watcher.py"
+            classes:
+              - name: "FileWatcher"
+                methods:
+                  - name: "start_monitoring"
+                    input: "watch_path"
+                    output: "void"
+                    invariants: ["ignore_git_venv_pycache", "max_file_size_1mb"]
+                  - name: "stop_monitoring"
+                    input: "void"
+                    output: "void"
+                    invariants: ["graceful_shutdown"]
+          - name: "tests/test_watcher.py"
+            type: "integration"
+            given_when_then:
+              - given: "watch_directory"
+                when: "file_modified"
+                then: "toc_updated_within_1sec"
+  - name: "cli"
+    responsibilities: ["command_interface", "daemon_control"]
+    dependencies: ["file_watcher"]
+    requirements: ["REQ-04", "REQ-07"]
+    folders:
+      - path: "src/cli"
+        files:
+          - name: "cli.py"
+            classes:
+              - name: "CLI"
+                methods:
+                  - name: "start"
+                    input: "void"
+                    output: "daemon_started"
+                    invariants: ["pid_file_created", "log_file_created"]
+                  - name: "stop"
+                    input: "void"
+                    output: "daemon_stopped"
+                    invariants: ["pid_file_removed"]
+                  - name: "status"
+                    input: "void"
+                    output: "running_or_stopped"
+                    invariants: ["pid_check"]
+          - name: "tests/test_cli.py"
+            type: "e2e"
+            given_when_then:
+              - given: "clean_environment"
+                when: "start_then_stop"
+                then: "no_diff_on_restart"
+interfaces:
+  cli:
+    - command: "ast_toc start"
+      input: "none"
+      output: "daemon_started"
+      exit_codes: { success: 0, error: 1 }
+      errors: ["already_running", "config_error"]
+    - command: "ast_toc stop"
+      input: "none"
+      output: "daemon_stopped"
+      exit_codes: { success: 0, error: 1 }
+      errors: ["not_running"]
+    - command: "ast_toc status"
+      input: "none"
+      output: "running_pid_or_stopped"
+      exit_codes: { success: 0, error: 1 }
+      errors: []
+data:
+  schemas:
+    - name: "TOCHeader"
+      fields: { file_toc: "string", module: "string", purpose: "string", classes: "list", functions: "list", imports: "list", updated: "datetime", generated_by: "string" }
+      invariants: ["atomic_write", "preserve_encoding", "preserve_line_endings"]
+    - name: "ASTStructure"
+      fields: { classes: "list", functions: "list", imports: "list" }
+      invariants: ["ignore_nested_functions", "no_type_annotations"]
+observability:
+  metrics:
+    - name: "toc.generation.latency_ms" ; type: "histogram" ; owner: "toc_generator"
+    - name: "file.watch.events_total" ; type: "counter" ; owner: "file_watcher"
+    - name: "daemon.uptime_seconds" ; type: "gauge" ; owner: "cli"
+tests:
+  pyramid:
+    unit: ">=70%"
+    integration: "~20%"
+    e2e: "~10%"
+traceability:
+  map_csv: "trace_matrix.csv"

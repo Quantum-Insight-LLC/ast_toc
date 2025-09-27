@@ -1,0 +1,16 @@
+errors:
+  - code: ERR-ALREADY-RUNNING
+    kind: cli
+    message: "Daemon is already running"
+  - code: ERR-NOT-RUNNING
+    kind: cli
+    message: "Daemon is not running"
+  - code: ERR-CONFIG
+    kind: cli
+    message: "Configuration error"
+  - code: ERR-PARSE
+    kind: file
+    message: "AST parse failed"
+  - code: ERR-WRITE
+    kind: file
+    message: "Atomic write failed"

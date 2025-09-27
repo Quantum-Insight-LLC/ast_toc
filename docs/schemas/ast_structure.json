@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ASTStructure",
+  "type": "object",
+  "properties": {
+    "classes": { "type": "array", "items": { "type": "string" } },
+    "functions": { "type": "array", "items": { "type": "string" } },
+    "imports": { "type": "array", "items": { "type": "string" } }
+  },
+  "required": ["classes","functions","imports"]
+}

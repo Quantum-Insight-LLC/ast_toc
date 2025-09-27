@@ -1,0 +1,13 @@
+﻿req_id,req_desc,contract_id,module,file,symbol,test_id,test_level,metric_acceptance,notes
+REQ-01,Хедер содержит FILE_TOC; Module; Purpose; Classes; Functions; Imports; Updated; Generated-By,FILE-CREATE-TOC,toc_generator,src/toc_generator/generator.py,TOCGenerator.generate_toc,tests/unit/test_generator.py::test_formatted_header_with_markers,unit,header_present=true,
+REQ-02,Хедер размещается в начале файла или над модульным docstring,FILE-CREATE-TOC,toc_generator,src/toc_generator/generator.py,TOCGenerator.generate_toc,tests/unit/test_generator.py::test_header_above_docstring,unit,position=top_or_above_docstring,
+REQ-03,Извлечение структуры через модуль ast; сигнатуры без аннотаций типов,FILE-CREATE-TOC,ast_parser,src/ast_parser/parser.py,ASTParser.parse_file,tests/unit/test_parser.py::test_extracted_classes_and_functions,unit,no_type_annotations_in_signatures=true,
+REQ-04,CLI команды: start; stop; status,CLI-START,cli,src/cli/cli.py,CLI.start,tests/e2e/test_cli.py::test_start,e2e,exit_code==0,см. также CLI-STOP; CLI-STATUS
+REQ-04,CLI команды: start; stop; status,CLI-STOP,cli,src/cli/cli.py,CLI.stop,tests/e2e/test_cli.py::test_stop,e2e,exit_code==0,
+REQ-04,CLI команды: start; stop; status,CLI-STATUS,cli,src/cli/cli.py,CLI.status,tests/e2e/test_cli.py::test_status,e2e,output_contains_pid=true,
+REQ-05,Игнорирование .git; .venv; __pycache__; файлов > 1 МБ,FILE-IGNORE-BIG,file_watcher,src/file_watcher/watcher.py,FileWatcher.should_ignore,tests/integration/test_watcher.py::test_large_file_ignored,integration,no_changes=true,
+REQ-06,Атомарная запись; сохранение кодировки и перевода строк,FILE-CREATE-TOC,toc_generator,src/toc_generator/generator.py,TOCGenerator.generate_toc,tests/unit/test_generator.py::test_atomic_write_ok,unit,atomic=true & encoding_preserved=true,
+REQ-07,Логирование с уровнями INFO/ERROR/DEBUG в .ast_toc.log,CLI-START,cli,src/cli/cli.py,CLI.start,tests/e2e/test_cli.py::test_logging_levels_present,e2e,log_file_created=true,
+REQ-08,Конфигурация через .ast_toc.yaml: watch_path; include/exclude; max_file_mb; header markers,CONFIG,cli,src/cli/cli.py,CLI.load_config,tests/integration/test_config.py::test_config_schema_valid,integration,schema_valid=true,ссылается на docs/schemas/ast_toc_config.json
+ACPT-01,TOC актуален ≤ 1 сек после изменения файла,FILE-CREATE-TOC,file_watcher,src/file_watcher/watcher.py,FileWatcher.on_modified,tests/integration/test_watcher.py::test_toc_updated_within_1sec,integration,update_latency_ms_p95<=1000,
+ACPT-02,Повторный запуск не даёт диффов,CLI-START,cli,src/cli/cli.py,CLI.start,tests/e2e/test_cli.py::test_no_diff_on_restart,e2e,no_diff_on_rerun=true,

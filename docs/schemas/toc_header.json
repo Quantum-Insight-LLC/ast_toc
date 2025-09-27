@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TOCHeader",
+  "type": "object",
+  "properties": {
+    "file_toc": { "type": "string", "const": "FILE_TOC" },
+    "module": { "type": "string" },
+    "purpose": { "type": "string" },
+    "classes": { "type": "array", "items": { "type": "string" } },
+    "functions": { "type": "array", "items": { "type": "string" } },
+    "imports": { "type": "array", "items": { "type": "string" } },
+    "updated": { "type": "string", "format": "date-time" },
+    "generated_by": { "type": "string" }
+  },
+  "required": ["file_toc","module","classes","functions","imports","updated","generated_by"]
+}

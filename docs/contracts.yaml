@@ -1,0 +1,65 @@
+contracts:
+  cli:
+    version: "1.0.0"
+    commands:
+      - id: CLI-START
+        command: "ast_toc start"
+        input: "none"
+        output: "daemon_started"
+        exit_codes: { success: 0, error: 1 }
+        errors: ["ERR-ALREADY-RUNNING", "ERR-CONFIG"]
+        observability:
+          logs: ["daemon.start"]
+          metrics: ["daemon.uptime_seconds"]
+      - id: CLI-STOP
+        command: "ast_toc stop"
+        input: "none"
+        output: "daemon_stopped"
+        exit_codes: { success: 0, error: 1 }
+        errors: ["ERR-NOT-RUNNING"]
+        observability:
+          logs: ["daemon.stop"]
+      - id: CLI-STATUS
+        command: "ast_toc status"
+        input: "none"
+        output: "running_pid_or_stopped"
+        exit_codes: { success: 0, error: 1 }
+        errors: []
+        observability:
+          logs: ["daemon.status"]
+  files:
+    version: "1.0.0"
+    behaviors:
+      - id: FILE-CREATE-TOC
+        event: "create_or_modify_py_file"
+        preconditions: ["size<=1MB", "path_included", "not_excluded"]
+        effect: "insert_or_update_toc_block_at_top"
+        invariants: ["atomic_write", "preserve_encoding", "preserve_line_endings"]
+        errors: ["ERR-PARSE", "ERR-WRITE"]
+      - id: FILE-IGNORE-BIG
+        event: "modify_large_file"
+        preconditions: ["size>1MB"]
+        effect: "no_changes"
+        logs: ["warn.large_file_skipped"]
+  config:
+    file: ".ast_toc.yaml"
+    schema_file: "docs/schemas/ast_toc_config.json"
+    policy:
+      required: ["watch_path", "pid_file", "log_file", "insert_above_docstring"]
+      defaults:
+        log_level: "INFO"
+        include: ["**/*.py"]
+        exclude: ["**/__pycache__/**", "**/.venv/**", "**/.git/**"]
+        max_file_mb: 1
+  data:
+    schemas:
+      - id: TOCHeader
+        file: "docs/schemas/toc_header.json"
+      - id: ASTStructure
+        file: "docs/schemas/ast_structure.json"
+  errors:
+    catalog_file: "docs/errors-catalog.yaml"
+  security:
+    notes:
+      - "no secrets in config; pid/log files are user-owned"
+      - "ignore system directories; do not follow symlinks outside project"
